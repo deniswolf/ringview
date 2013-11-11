@@ -25,10 +25,12 @@
 	ringViewVisualizer._buildDataCollection = function _buildDataCollection(params) {
 		var collection = {};
 		_.each(params, function (token) {
-				if (!collection[token.length]) {
-					collection[token.length] = [];
+				// act as 0-based array
+				var index = token.length - 1;
+				if (!collection[index]) {
+					collection[index] = [];
 				}
-				collection[token.length].push(token);
+				collection[index].push(token);
 			}
 		);
 		return collection;
