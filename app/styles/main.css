@@ -4,7 +4,7 @@ body {
     color: #333;
 }
 
-.tokenRuler {
+.tokenRuler>div {
     margin: 30px auto 0 auto;
     width: 90%;
     font-size: 18px;
@@ -15,7 +15,7 @@ body {
     padding: 20px 20px 80px;
 }
 
-.tokenRuler>span {
+.tokenRuler>div>span {
     padding-top: 5px;
     padding-bottom: 5px;
     height: 50px;
@@ -24,7 +24,7 @@ body {
     float: right;
 }
 
-.tokenRuler>span>div {
+.tokenRuler>div>span>div {
     height: 10%;
     width: 80%;
     border: solid navajowhite 1px;
