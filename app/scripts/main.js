@@ -15,11 +15,17 @@
 				throw tokenString + ' is not an integer';
 			}
 
+
 			// naive implementation}
 			if (tokenString.length > this.maxLength) {
 				throw tokenString + ' is too big';
 			}
 		},this);
+
+		var uniq = _.uniq(tokenStrings);
+		if(uniq.length !== tokenStrings.length){
+			throw 'duplicated values in token string';
+		}
 	};
 
 	ringViewVisualizer._buildDataCollection = function _buildDataCollection(params) {
@@ -71,7 +77,7 @@
 	};
 
 	var params = ['1701411834', '123', '93',
-		'3', '6923173730371588', '123', '1',
+		'73', '6923173730371588', '1253111',
 		'234233', '69231737303715812333328',
 		'3', '69231473730371588', '1231233',
 		'1', '124124142', '124124', '12312'
