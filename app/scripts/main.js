@@ -1,3 +1,11 @@
+(function (){
+	// mustache-styled templating
+	_.templateSettings = {
+		'interpolate': /{{([\s\S]+?)}}/g
+	};
+
+})();
+
 (function(){
 	'use strict';
 
@@ -49,18 +57,29 @@
 		}
 		_.each(tokensCollection, function addByRange (tokenChunks, index) {
 			_.each(tokenChunks, function addByToken (tokenId) {
-					var el = document.createElement('div');
-					el.setAttribute('data-token-id', tokenId);
-					rangesContainers[index].appendChild(el);
-				});
+				var el = document.createElement('div');
+				el.setAttribute('data-token-id', tokenId);
+				rangesContainers[index].appendChild(el);
+			});
 		});
 		return rangesContainers;
 	};
 
+
 	ringViewVisualizer._createVisualisation = function _createVusialisation(container, arity, tokens){
-		var tokenRanges = this._createElementsByTokenRange(arity, tokens);
-		var parentElement = document.createElement('div');
-		_.each(tokenRanges.reverse(), function (tokenDiv) {
+		var css = generateCircularAreasClasses(),
+			parentElement = document.createElement('div'),
+			tokenRanges = this._createElementsByTokenRange(arity, tokens);
+
+		document.head.appendChild(css.style);
+		parentElement.classList.add('token-circle-container');
+
+		if(css.classNames.length !== tokenRanges.length){
+			throw 'error in css/token calculations for Circle View';
+		}
+
+		_.each(tokenRanges, function (tokenDiv, index) {
+			tokenDiv.classList.add(css.classNames[index]);
 			parentElement.appendChild(tokenDiv);
 		});
 		return parentElement;
@@ -76,6 +95,32 @@
 		return this._createVisualisation(container, arity, tokens);
 	};
 
+	function generateCircularAreasClasses(){
+		var radius = '12em';
+		var numberOfArias = '170141183460469231731687303715884105728'.length;
+		var degreeDelta = 360/numberOfArias;
+		var degree = 270;
+		var degreeName;
+		var classCode = '';
+		var styleElement = document.createElement('style');
+		var classNames = [];
+
+		for(var i = 0; i< numberOfArias; i++){
+			degreeName = Math.round(degree);
+			classNames.push('deg'+degreeName);
+			classCode += _.template(
+				".deg{{degreeName}} {"+
+					"-webkit-transform: rotate({{degree}}) translate({{radius}}) rotate(-{{degree}});"+
+					"transform: rotate({{degree}}) translate({{radius}}) rotate(-{{degree}});"+
+					"}\n",
+				{degree:degree+'deg', radius: radius, degreeName: degreeName}
+			);
+			degree = degree + degreeDelta;
+		}
+		styleElement.appendChild(document.createTextNode(classCode));
+		return {style:styleElement, classNames: classNames};
+
+	}
 	var params = ['1701411834', '123', '93',
 		'73', '6923173730371588', '1253111',
 		'234233', '69231737303715812333328',
@@ -83,7 +128,7 @@
 		'1', '124124142', '124124', '12312'
 	];
 
-	var container = document.body.querySelector('#container');
+	var container = document.body;
 
 	var visualisation = ringViewVisualizer.generate(params);
 	container.appendChild(visualisation);
