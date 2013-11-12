@@ -20,7 +20,8 @@ body {
     position: absolute;
     bottom: 280px;
     top: 0;
-    margin-left: -6px;
+    /*compensate margin + width from .token*/
+    margin-left: -8px;
     -webkit-transform:rotate(180deg);
 }
 
