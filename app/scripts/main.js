@@ -65,7 +65,6 @@ _.templateSettings = {
 					el.classList.add('token');
 					el.setAttribute('data-token-id', tokenId);
 
-				console.log(el);
 					rangesContainers[index].firstChild.appendChild(el);
 				});
 		});
@@ -107,11 +106,16 @@ _.templateSettings = {
 				".deg{{degreeName}} {"+
 					"-webkit-transform: rotate({{degree}});"+
 					"transform: rotate({{degree}});"+
-					"}\n",
-				{degree:degree+'deg', degreeName: degreeName}
+				"}\n"+
+				".deg{{degreeName}} .token:active:after{"+
+					"-webkit-transform: rotate({{tooltipDegree}});"+
+					"transform: rotate({{tooltipDegree}});"+
+				"}\n",
+				{degree:degree+'deg', degreeName: degreeName, tooltipDegree: ''+(180-degree)+'deg'}
 			);
 			degree = degree + degreeDelta;
 		}
+		console.log(classCode);
 		styleElement.appendChild(document.createTextNode(classCode));
 		return {style:styleElement, classNames: classNames};
 	};
