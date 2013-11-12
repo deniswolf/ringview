@@ -1,3 +1,8 @@
+// hello mustache
+_.templateSettings = {
+	'interpolate': /{{([\s\S]+?)}}/g
+};
+
 (function(){
 	'use strict';
 
@@ -44,26 +49,71 @@
 
 	ringViewVisualizer._createElementsByTokenRange = function _createElementByTokenRange(arity, tokensCollection) {
 		var rangesContainers = [];
+		var iterativeContainer;
+		var wrapperContainer;
 		for (var i = 1; i <= arity; i++) {
-			rangesContainers.push(document.createElement('span'));
+			iterativeContainer = document.createElement('div');
+			iterativeContainer.classList.add('tokens-radius');
+			wrapperContainer = document.createElement('div');
+			wrapperContainer.classList.add('tokens-box');
+			iterativeContainer.appendChild(wrapperContainer);
+			rangesContainers.push(iterativeContainer);
 		}
 		_.each(tokensCollection, function addByRange (tokenChunks, index) {
 			_.each(tokenChunks, function addByToken (tokenId) {
 					var el = document.createElement('div');
+					el.classList.add('token');
 					el.setAttribute('data-token-id', tokenId);
-					rangesContainers[index].appendChild(el);
+
+				console.log(el);
+					rangesContainers[index].firstChild.appendChild(el);
 				});
 		});
 		return rangesContainers;
 	};
 
 	ringViewVisualizer._createVisualisation = function _createVusialisation(container, arity, tokens){
-		var tokenRanges = this._createElementsByTokenRange(arity, tokens);
-		var parentElement = document.createElement('div');
-		_.each(tokenRanges.reverse(), function (tokenDiv) {
+		var css = this._generateCircleClasses(arity),
+			parentElement = document.createElement('div'),
+			tokenRanges = this._createElementsByTokenRange(arity, tokens);
+
+		document.head.appendChild(css.style);
+		parentElement.classList.add('token-visualisation');
+
+		if(css.classNames.length !== tokenRanges.length){
+			throw 'error in css/token calculations for Circle View';
+		}
+
+		_.each(tokenRanges, function (tokenDiv, index) {
+			tokenDiv.classList.add(css.classNames[index]);
 			parentElement.appendChild(tokenDiv);
 		});
+
 		return parentElement;
+	};
+
+	ringViewVisualizer._generateCircleClasses = function _generateCircleClasses(numberOfArias){
+		var degreeDelta = 360/numberOfArias;
+		var degree = 0;
+		var degreeName;
+		var classCode = '';
+		var styleElement = document.createElement('style');
+		var classNames = [];
+
+		for(var i = 0; i< numberOfArias; i++){
+			degreeName = Math.round(degree);
+			classNames.push('deg'+degreeName);
+			classCode += _.template(
+				".deg{{degreeName}} {"+
+					"-webkit-transform: rotate({{degree}});"+
+					"transform: rotate({{degree}});"+
+					"}\n",
+				{degree:degree+'deg', degreeName: degreeName}
+			);
+			degree = degree + degreeDelta;
+		}
+		styleElement.appendChild(document.createTextNode(classCode));
+		return {style:styleElement, classNames: classNames};
 	};
 
 	ringViewVisualizer.generate = function generate(listOfTokens) {
@@ -83,7 +133,7 @@
 		'1', '124124142', '124124', '12312'
 	];
 
-	var container = document.body.querySelector('#container');
+	var container = document.body;
 
 	var visualisation = ringViewVisualizer.generate(params);
 	container.appendChild(visualisation);

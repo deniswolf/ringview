@@ -4,37 +4,34 @@ body {
     color: #333;
 }
 
-.tokenRuler>div {
-    margin: 30px auto 0 auto;
-    width: 90%;
-    font-size: 18px;
-    background-color: #eee;
-    border-radius: 6px;
-    padding: 20px 20px 380px;
+.token-visualisation{
+    margin: 300px 300px;
 }
 
-.tokenRuler>div>span {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    height: 340px;
-    width: 2.4%;
-    border: solid #232323 1px;
-    float: right;
+.tokens-radius {
+    position: absolute;
+    height: 400px;
+    width: 30px;
+    float: left;
 }
 
-.tokenRuler>div>span>div {
-    height: 1%;
-    width: 80%;
-    border: solid navajowhite 1px;
-    background: #ff4500;
-    margin: 0 auto;
+.tokens-box {
+    position: absolute;
+    bottom: 280px;
+    top: 0;
+    /*background: pink;*/
+    margin: 5px;
+    -webkit-transform:rotate(180deg);
 }
 
-.tokenRuler>div>span>div {
-    position: relative;
+.token {
+    background: skyblue;
+    height: 5px;
+    margin: 3px;
+    width: 10px;
 }
 
-.tokenRuler>div>span>div:active:after {
+.token:after:hover {
     background: #f5f5f5;
     border: 1px solid #ff4500;
     border-radius: 6px;
@@ -44,6 +41,5 @@ body {
     line-height: 32px;
     position: absolute;
     top: -16px;
-    z-index: 1;
 }
 
