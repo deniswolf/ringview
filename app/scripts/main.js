@@ -10,6 +10,15 @@ _.templateSettings = {
 
 	// max number for Token's integer
 	ringViewVisualizer.maxLength = '170141183460469231731687303715884105728'.length;
+	/*
+		If we know the maximum possible value,
+		it's possible to choose the most optimal distribution,
+		here: 34*5 = 170,
+		34 was chosen for a better visualization for the current size
+	* */
+	ringViewVisualizer.maxValueStripped = '170';
+	ringViewVisualizer.stepBetweenSectors = 5;
+	ringViewVisualizer.numberOfSectors = 34;
 
 	ringViewVisualizer._validate = function _validate(tokenStrings) {
 		_.each(tokenStrings, function (tokenString) {
@@ -33,17 +42,40 @@ _.templateSettings = {
 		}
 	};
 
-	ringViewVisualizer._buildDataCollection = function _buildDataCollection(params) {
+	ringViewVisualizer._getPositioningBySector = function(maxLength, maxValueStripped, maxSectors, minStep, token){
+		var length = token.length;
+
+		if(maxLength < maxValueStripped.length){
+			throw 'the token is too big';
+		}
+
+		if(maxLength - length >= maxValueStripped.length){
+			return 1;
+		}
+
+		var cutAt = maxValueStripped.length - (maxLength - length);
+		var value = parseInt(token.slice(0,cutAt),10);
+
+		// naive implementation, doesn't check if numbers after maxValueStripped are too big
+		if(length === maxLength && value > parseInt(maxValueStripped,10)){
+			throw 'the token is too big';
+		}
+
+		return Math.round(value/minStep);
+	};
+
+	ringViewVisualizer._buildDataCollection = function _buildDataCollection(params, arity) {
 		var collection = {};
+		for(var i = 0; i < arity; i++){
+			collection[i] = [];
+		}
 		_.each(params, function (token) {
-				// act as 0-based array
-				var index = token.length - 1;
-				if (!collection[index]) {
-					collection[index] = [];
-				}
+				var sector = this._getPositioningBySector(this.maxLength, '170',this.numberOfSectors, this.stepBetweenSectors, token);
+				// acts as 0-based array
+				var index = sector - 1;
 				collection[index].push(token);
-			}
-		);
+			},
+			this);
 		return collection;
 	};
 
@@ -115,26 +147,41 @@ _.templateSettings = {
 			);
 			degree = degree + degreeDelta;
 		}
-		console.log(classCode);
 		styleElement.appendChild(document.createTextNode(classCode));
 		return {style:styleElement, classNames: classNames};
 	};
 
 	ringViewVisualizer.generate = function generate(listOfTokens) {
-		var arity = this.maxLength,
+		var arity = this.numberOfSectors,
 			container = document.createElement('div');
 
 		this._validate(listOfTokens);
 
-		var tokens = this._buildDataCollection(listOfTokens);
+		var tokens = this._buildDataCollection(listOfTokens, arity);
 		return this._createVisualisation(container, arity, tokens);
 	};
 
-	var params = ['1701411834', '123', '93',
-		'73', '6923173730371588', '1253111',
-		'234233', '69231737303715812333328',
-		'3', '69231473730371588', '1231233',
-		'1', '124124142', '124124', '12312'
+	var params = [
+		'1',
+		'1000',
+
+		// 2^125
+		'42535295865117307932921825928971026432',
+		// 2^126
+		'85070591730234615865843651857942052864',
+
+		'73',
+		'5298074214633306907124124122121241241',
+		'92980742146337069071241241221212412411',
+
+		'62980742146337069071241241221212412311',
+		'72980742146337069071241241221212412311',
+		'129807421463370690712412412212124123110',
+		'139807421463370690712412412212124123110',
+		'149807421463370690712412412212124123110',
+		'150807421463370690712412412212124123110',
+		'168807421463370690712412412212124123110',
+		'170141183460469231731687303715884105728'
 	];
 
 	var container = document.body;
